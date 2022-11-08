@@ -1,31 +1,39 @@
 plugins {
     kotlin("multiplatform") version "1.7.20"
+
+    `maven-publish`
+
 }
 
-group = "org.bereft"
+group = "org.ta4k"
 version = "1.0-SNAPSHOT"
 
-repositories {
-    mavenCentral()
-}
 
+repositories {
+    mavenLocal()
+    maven("https://oss.sonatype.org/content/repositories/snapshots/")
+    maven("https://mvnrepository.com/artifact/org.jetbrains.kotlinx/")
+    mavenCentral()
+    gradlePluginPortal()
+    google()
+}
 kotlin {
     jvm {
         compilations.all {
-            kotlinOptions.jvmTarget = "1.8"
+            kotlinOptions.jvmTarget = "18" //floating point math changes here
         }
         withJava()
         testRuns["test"].executionTask.configure {
             useJUnitPlatform()
         }
     }
-    js(BOTH) {
-        browser {
-            commonWebpackConfig {
-                cssSupport.enabled = true
-            }
-        }
-    }
+//    js(BOTH) {
+//        browser {
+//            commonWebpackConfig {
+//                cssSupport.enabled = true
+//            }
+//        }
+//    }
     val hostOs = System.getProperty("os.name")
     val isMingwX64 = hostOs.startsWith("Windows")
     val nativeTarget = when {
@@ -37,7 +45,12 @@ kotlin {
 
     
     sourceSets {
-        val commonMain by getting
+        val commonMain by getting{
+            dependencies {
+                implementation(kotlin("stdlib-common"))
+                api("org.bereft:trikeshed:1.0")
+            }
+        }
         val commonTest by getting {
             dependencies {
                 implementation(kotlin("test"))
@@ -45,8 +58,8 @@ kotlin {
         }
         val jvmMain by getting
         val jvmTest by getting
-        val jsMain by getting
-        val jsTest by getting
+//        val jsMain by getting
+//        val jsTest by getting
         val nativeMain by getting
         val nativeTest by getting
     }
